@@ -24,28 +24,58 @@ void main() {
   );
 }
 
-class InelecApp extends StatelessWidget {
+class InelecApp extends StatefulWidget {
   const InelecApp({super.key});
 
   @override
+  State<InelecApp> createState() => _InelecAppState();
+}
+
+class _InelecAppState extends State<InelecApp> {
+  final ValueNotifier<ThemeMode> _themeModeNotifier = ValueNotifier(
+    ThemeMode.light,
+  );
+
+  @override
+  void dispose() {
+    _themeModeNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'INELEC APP',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        // Using the Purple from your design
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF701B99)),
-        useMaterial3: true,
-      ),
-      // Typically, you'd start at a Login Screen.
-      // For now, let's start at the Navigation Shell.
-      home: const MainNavigationShell(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: _themeModeNotifier,
+      builder: (context, themeMode, child) {
+        return MaterialApp(
+          title: 'INELEC APP',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF701B99),
+            ),
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF701B99),
+              brightness: Brightness.dark,
+            ),
+            useMaterial3: true,
+          ),
+          themeMode: themeMode,
+          home: MainNavigationShell(themeModeNotifier: _themeModeNotifier),
+        );
+      },
     );
   }
 }
 
 class MainNavigationShell extends StatefulWidget {
-  const MainNavigationShell({super.key});
+  const MainNavigationShell({super.key, required this.themeModeNotifier});
+
+  final ValueNotifier<ThemeMode> themeModeNotifier;
 
   @override
   State<MainNavigationShell> createState() => _MainNavigationShellState();
@@ -54,19 +84,20 @@ class MainNavigationShell extends StatefulWidget {
 class _MainNavigationShellState extends State<MainNavigationShell> {
   int _selectedIndex = 0;
 
-  // The 5 main views for the Bottom Navigation Bar
-  final List<Widget> _bottomBarScreens = [
-    const HomeScreen(), // Main Menu with the 4 big buttons
+  void _navigateTo(Widget screen) {
+    Navigator.pop(context); // Close drawer
+    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+  }
+
+  List<Widget> get _bottomBarScreens => [
+    HomeScreen(
+      onAssignmentsTap: () => setState(() => _selectedIndex = 2),
+    ), // Main Menu with the 4 big buttons
     const ModulesScreen(), // Modules list
     const AssignmentsScreen(), // Assignments view
     const AttendanceScreen(), // Attendance view
     const GradesScreen(), // Grade Calculator / Grades view
   ];
-
-  void _navigateTo(Widget screen) {
-    Navigator.pop(context); // Close drawer
-    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +143,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: const Text('Settings'),
-              onTap: () => _navigateTo(const SettingsScreen()),
+              onTap: () => _navigateTo(
+                SettingsScreen(themeModeNotifier: widget.themeModeNotifier),
+              ),
             ),
             const SizedBox(height: 20),
           ],
