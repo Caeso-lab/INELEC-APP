@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'calendar_screen.dart';
+import 'assignments_screen.dart';
+import 'exam_schedule_screen.dart';
+import 'grades_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.onAssignmentsTap});
+
+  final VoidCallback? onAssignmentsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,27 +28,66 @@ class HomeScreen extends StatelessWidget {
               child: const Icon(Icons.school, color: Colors.white, size: 40),
             ),
             const SizedBox(height: 40),
-            
+
             // Navigation Buttons
-            _buildMenuButton(context, Icons.grid_view, 'Time Table'),
-            _buildMenuButton(context, Icons.access_time, 'Assignments'),
-            _buildMenuButton(context, Icons.calendar_today, 'Exam Schedule'),
-            _buildMenuButton(context, Icons.calculate, 'Grade Calculator'),
-            
-            const SizedBox(height: 20), // Bottom padding to ensure last item is clear
+            _buildMenuButton(context, Icons.grid_view, 'Time Table', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CalendarScreen()),
+              );
+            }),
+            _buildMenuButton(context, Icons.access_time, 'Assignments', () {
+              if (onAssignmentsTap != null) {
+                onAssignmentsTap!();
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AssignmentsScreen(),
+                  ),
+                );
+              }
+            }),
+            _buildMenuButton(
+              context,
+              Icons.calendar_today,
+              'Exam Schedule',
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ExamScheduleScreen(),
+                  ),
+                );
+              },
+            ),
+            _buildMenuButton(context, Icons.calculate, 'Grade Calculator', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const GradesScreen()),
+              );
+            }),
+
+            const SizedBox(
+              height: 20,
+            ), // Bottom padding to ensure last item is clear
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMenuButton(BuildContext context, IconData icon, String title) {
+  Widget _buildMenuButton(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15.0),
-      child: InkWell( // Use InkWell for better touch feedback
-        onTap: () {
-          print("$title clicked");
-        },
+      child: InkWell(
+        // Use InkWell for better touch feedback
+        onTap: onTap,
         borderRadius: BorderRadius.circular(15),
         child: Container(
           height: 80,
@@ -50,7 +95,8 @@ class HomeScreen extends StatelessWidget {
             border: Border.all(color: const Color(0xFF701B99), width: 1.5),
             borderRadius: BorderRadius.circular(15),
           ),
-          child: Center( // Using Center + Row for more control than ListTile
+          child: Center(
+            // Using Center + Row for more control than ListTile
             child: Row(
               children: [
                 const SizedBox(width: 20),
@@ -58,7 +104,10 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(width: 20),
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
