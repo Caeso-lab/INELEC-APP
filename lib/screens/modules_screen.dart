@@ -1,33 +1,29 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(
-    const MaterialApp(home: ModulesScreen(), debugShowCheckedModeBanner: false),
-  );
-}
-
 class ModulesScreen extends StatelessWidget {
   const ModulesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: colorScheme.primary,
           elevation: 0,
           title: const Text(
             'MODULES',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
+          foregroundColor: colorScheme.onPrimary,
           centerTitle: true,
-          bottom: const TabBar(
-            indicatorColor: Colors.white,
+          bottom: TabBar(
+            indicatorColor: colorScheme.onPrimary,
             indicatorWeight: 3,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
+            labelColor: colorScheme.onPrimary,
+            unselectedLabelColor: colorScheme.onPrimary.withValues(alpha: 0.7),
             tabs: [
               Tab(text: 'SEMESTRE 1'),
               Tab(text: 'SEMESTRE 2'),
@@ -52,7 +48,7 @@ class ModulesScreen extends StatelessWidget {
             children: [
               const SizedBox(width: 8),
               Text(
-                'Semaster I',
+                'Semester I',
                 style: TextStyle(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -65,7 +61,7 @@ class ModulesScreen extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: colorScheme.surface,
+                color: colorScheme.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
@@ -109,7 +105,7 @@ Widget _buildModuleList2(BuildContext context) {
           children: [
             const SizedBox(width: 8),
             Text(
-              'Semaster II',
+              'Semester II',
               style: TextStyle(
                 color: colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -122,7 +118,7 @@ Widget _buildModuleList2(BuildContext context) {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: colorScheme.surface,
+              color: colorScheme.surfaceContainerLow,
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
@@ -163,20 +159,12 @@ class ModuleItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 4,
-          ),
-          title: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-          ),
-          trailing: Row(mainAxisSize: MainAxisSize.min, children: []),
-        ),
-      ],
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+      ),
     );
   }
 }

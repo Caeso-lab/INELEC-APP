@@ -10,14 +10,10 @@ class AssignmentsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          Icon(Icons.school, color: colorScheme.primary, size: 50),
-          Text(
+          const Icon(Icons.school, color: Color(0xFF701B99), size: 50),
+          const Text(
             "Assignments",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onBackground,
-            ),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           Container(
@@ -63,16 +59,9 @@ class AssignmentsScreen extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: colorScheme.onSurface,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        Text(
-          due,
-          style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
-        ),
+        Text(due, style: const TextStyle(color: Colors.grey)),
         const SizedBox(height: 10),
         ElevatedButton.icon(
           onPressed: () {},

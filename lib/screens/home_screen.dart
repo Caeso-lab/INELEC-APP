@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
+                  color: Colors.black.withValues(),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(Icons.school, color: accentColor, size: 40),
@@ -124,7 +124,7 @@ class HomeScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),

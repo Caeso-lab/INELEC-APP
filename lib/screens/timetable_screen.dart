@@ -5,13 +5,21 @@ class TimetableScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final Color headerColor = colorScheme.primaryContainer;
-    final Color borderColor = colorScheme.outline;
-    final Color cellColor = colorScheme.surfaceVariant;
-    final Color titleColor = colorScheme.onSurface;
-    final Color subtitleColor = colorScheme.onSurfaceVariant;
-    final Color accentColor = colorScheme.primary;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color headerColor = isDarkMode
+        ? const Color(0xFF4A2159)
+        : const Color(0xFFEEDCFF);
+    final Color borderColor = isDarkMode
+        ? const Color(0xFF6B3F7A)
+        : const Color(0xFFD7B8EE);
+    final Color cellColor = isDarkMode
+        ? const Color(0xFF2F1940)
+        : const Color(0xFFFDF4FF);
+    final Color titleColor = isDarkMode ? Colors.white : Colors.black;
+    final Color subtitleColor = isDarkMode
+        ? const Color(0xFFCFB0E7)
+        : const Color(0xFF6F4F92);
+    final Color accentColor = const Color(0xFF701B99);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Time Table'), centerTitle: true),

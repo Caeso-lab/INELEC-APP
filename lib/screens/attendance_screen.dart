@@ -177,8 +177,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: isPresent
-                  ? colorScheme.primary.withOpacity(0.12)
-                  : Colors.red.withOpacity(0.1),
+                  ? Colors.green.withValues()
+                  : Colors.red.withValues(),
               child: Icon(
                 isPresent ? Icons.check_circle : Icons.cancel,
                 color: isPresent ? colorScheme.primary : Colors.red,

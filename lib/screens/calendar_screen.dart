@@ -110,14 +110,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
           textStyle: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: colorScheme.onBackground,
+            color: Colors.black,
           ),
         ),
         viewHeaderStyle: ViewHeaderStyle(
           dayTextStyle: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: colorScheme.onBackground,
+            color: Colors.black,
           ),
         ),
         appointmentTextStyle: TextStyle(

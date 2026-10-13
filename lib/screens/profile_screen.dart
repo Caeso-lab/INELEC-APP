@@ -6,9 +6,10 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final labelColor = colorScheme.onSurfaceVariant;
-    final valueColor = colorScheme.onSurface.withOpacity(0.8);
-    final studentIdColor = colorScheme.onSurfaceVariant;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final labelColor = isDarkMode ? Colors.grey[300] : Colors.black87;
+    final valueColor = isDarkMode ? Colors.grey[400] : Colors.grey[700];
+    final studentIdColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
 
     return Scaffold(
       appBar: AppBar(

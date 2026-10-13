@@ -68,51 +68,6 @@ class SettingsScreen extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 24),
-            const Text(
-              'Color Theme',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ValueListenableBuilder<AppColorTheme>(
-              valueListenable: themeChoiceNotifier,
-              builder: (context, selectedTheme, child) {
-                return Column(
-                  children: [
-                    RadioListTile<AppColorTheme>(
-                      title: const Text('Green Theme'),
-                      value: AppColorTheme.green,
-                      groupValue: selectedTheme,
-                      onChanged: (value) {
-                        if (value != null) {
-                          themeChoiceNotifier.value = value;
-                        }
-                      },
-                    ),
-                    RadioListTile<AppColorTheme>(
-                      title: const Text('Purple Theme'),
-                      value: AppColorTheme.purple,
-                      groupValue: selectedTheme,
-                      onChanged: (value) {
-                        if (value != null) {
-                          themeChoiceNotifier.value = value;
-                        }
-                      },
-                    ),
-                    RadioListTile<AppColorTheme>(
-                      title: const Text('Blue Theme'),
-                      value: AppColorTheme.blue,
-                      groupValue: selectedTheme,
-                      onChanged: (value) {
-                        if (value != null) {
-                          themeChoiceNotifier.value = value;
-                        }
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
           ],
         ),
       ),

@@ -22,18 +22,25 @@ class _GradesScreenState extends State<GradesScreen> {
   Future<void> _loadEntries() async {
     final prefs = await SharedPreferences.getInstance();
     final savedData = prefs.getStringList('grade_entries') ?? [];
+    if (!mounted) return;
+
     setState(() {
       _entries.clear();
       for (var entry in savedData) {
         final parts = entry.split('|');
         if (parts.length == 3) {
-          _entries.add(
-            _GradeEntry(
-              parts[0],
-              double.tryParse(parts[1]) ?? 0,
-              double.tryParse(parts[2]) ?? 0,
-            ),
-          );
+          final grade = double.tryParse(parts[1]);
+          final coeff = double.tryParse(parts[2]);
+          if (grade == null ||
+              !grade.isFinite ||
+              grade < 0 ||
+              grade > 20 ||
+              coeff == null ||
+              !coeff.isFinite ||
+              coeff <= 0) {
+            continue;
+          }
+          _entries.add(_GradeEntry(parts[0], grade, coeff));
         }
       }
     });
@@ -68,12 +75,13 @@ class _GradesScreenState extends State<GradesScreen> {
 
   bool get _isPassed => _weightedAverage >= 10;
 
-  void _addEntry() {
+  Future<void> _addEntry() async {
     if (!_formKey.currentState!.validate()) return;
 
     final moduleName = _moduleController.text.trim();
-    final grade = double.parse(_gradeController.text.trim());
-    final coeff = double.parse(_coeffController.text.trim());
+    final grade = double.tryParse(_gradeController.text.trim());
+    final coeff = double.tryParse(_coeffController.text.trim());
+    if (grade == null || coeff == null) return;
 
     setState(() {
       _entries.add(_GradeEntry(moduleName, grade, coeff));
@@ -81,14 +89,14 @@ class _GradesScreenState extends State<GradesScreen> {
       _gradeController.clear();
       _coeffController.clear();
     });
-    _saveEntries(); // Save entries whenever a new one is added
+    await _saveEntries();
   }
 
-  void _removeEntry(int index) {
+  Future<void> _removeEntry(int index) async {
     setState(() {
       _entries.removeAt(index);
     });
-    _saveEntries(); // Save entries whenever one is removed
+    await _saveEntries();
   }
 
   @override
@@ -104,12 +112,12 @@ class _GradesScreenState extends State<GradesScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final headingBackgroundColor = colorScheme.primaryContainer;
     final headingTextColor = colorScheme.onPrimaryContainer;
-    final cardBackgroundColor = colorScheme.surfaceVariant;
+    final cardBackgroundColor = colorScheme.surfaceContainerHighest;
     final cardBorderColor = colorScheme.outline;
     final bodyTextColor = colorScheme.onSurface;
-    final secondaryTextColor = colorScheme.onBackground.withOpacity(0.7);
+    final secondaryTextColor = colorScheme.onSurface.withValues(alpha: 0.7);
     final resultTextColor = _entries.isEmpty
-        ? colorScheme.onSurface.withOpacity(0.7)
+        ? colorScheme.onSurface.withValues(alpha: 0.7)
         : (_isPassed ? Colors.green : Colors.red);
 
     return Scaffold(
@@ -172,8 +180,11 @@ class _GradesScreenState extends State<GradesScreen> {
                               if (value == null || value.trim().isEmpty) {
                                 return 'Enter a grade';
                               }
-                              final grade = double.tryParse(value);
-                              if (grade == null || grade < 0 || grade > 20) {
+                              final grade = double.tryParse(value.trim());
+                              if (grade == null ||
+                                  !grade.isFinite ||
+                                  grade < 0 ||
+                                  grade > 20) {
                                 return 'Grade must be 0-20';
                               }
                               return null;
@@ -196,8 +207,10 @@ class _GradesScreenState extends State<GradesScreen> {
                               if (value == null || value.trim().isEmpty) {
                                 return 'Enter a coefficient';
                               }
-                              final coeff = double.tryParse(value);
-                              if (coeff == null || coeff <= 0) {
+                              final coeff = double.tryParse(value.trim());
+                              if (coeff == null ||
+                                  !coeff.isFinite ||
+                                  coeff <= 0) {
                                 return 'Coeff must be > 0';
                               }
                               return null;
@@ -219,9 +232,7 @@ class _GradesScreenState extends State<GradesScreen> {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
+                          backgroundColor: colorScheme.primary,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         onPressed: _addEntry,
@@ -247,86 +258,89 @@ class _GradesScreenState extends State<GradesScreen> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.primary,
+                            color: colorScheme.primary,
                             width: 1.3,
                           ),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: SingleChildScrollView(
-                          child: DataTable(
-                            headingRowColor: WidgetStateProperty.all(
-                              headingBackgroundColor,
-                            ),
-                            columnSpacing: 16,
-                            columns: [
-                              DataColumn(
-                                label: Text(
-                                  'Module',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: headingTextColor,
-                                  ),
-                                ),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              headingRowColor: WidgetStateProperty.all(
+                                headingBackgroundColor,
                               ),
-                              DataColumn(
-                                label: Text(
-                                  'Grade',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: headingTextColor,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Coeff',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: headingTextColor,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  '',
-                                  style: TextStyle(color: headingTextColor),
-                                ),
-                              ),
-                            ],
-                            rows: List.generate(_entries.length, (index) {
-                              final entry = _entries[index];
-                              return DataRow(
-                                cells: [
-                                  DataCell(
-                                    Text(
-                                      entry.module,
-                                      style: TextStyle(color: bodyTextColor),
+                              columnSpacing: 16,
+                              columns: [
+                                DataColumn(
+                                  label: Text(
+                                    'Module',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: headingTextColor,
                                     ),
                                   ),
-                                  DataCell(
-                                    Text(
-                                      entry.grade.toStringAsFixed(1),
-                                      style: TextStyle(color: bodyTextColor),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Grade',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: headingTextColor,
                                     ),
                                   ),
-                                  DataCell(
-                                    Text(
-                                      entry.coeff.toStringAsFixed(1),
-                                      style: TextStyle(color: bodyTextColor),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Coeff',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: headingTextColor,
                                     ),
                                   ),
-                                  DataCell(
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.redAccent,
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    '',
+                                    style: TextStyle(color: headingTextColor),
+                                  ),
+                                ),
+                              ],
+                              rows: List.generate(_entries.length, (index) {
+                                final entry = _entries[index];
+                                return DataRow(
+                                  cells: [
+                                    DataCell(
+                                      Text(
+                                        entry.module,
+                                        style: TextStyle(color: bodyTextColor),
                                       ),
-                                      onPressed: () => _removeEntry(index),
                                     ),
-                                  ),
-                                ],
-                              );
-                            }),
+                                    DataCell(
+                                      Text(
+                                        entry.grade.toStringAsFixed(1),
+                                        style: TextStyle(color: bodyTextColor),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        entry.coeff.toStringAsFixed(1),
+                                        style: TextStyle(color: bodyTextColor),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.delete_outline,
+                                          color: Colors.redAccent,
+                                        ),
+                                        onPressed: () => _removeEntry(index),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ),
                           ),
                         ),
                       ),
