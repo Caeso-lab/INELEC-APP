@@ -29,7 +29,7 @@ class SettingsScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,6 +64,37 @@ class SettingsScreen extends StatelessWidget {
                         value: ThemeMode.system,
                       ),
                     ],
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Color Theme',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ValueListenableBuilder<AppColorTheme>(
+              valueListenable: themeChoiceNotifier,
+              builder: (context, selectedTheme, child) {
+                return RadioGroup<AppColorTheme>(
+                  groupValue: selectedTheme,
+                  onChanged: (AppColorTheme? value) {
+                    if (value != null) {
+                      themeChoiceNotifier.value = value;
+                    }
+                  },
+                  child: Column(
+                    children: AppColorTheme.values.map((theme) {
+                      return RadioListTile<AppColorTheme>(
+                        value: theme,
+                        title: Text(theme.displayName),
+                        secondary: CircleAvatar(
+                          radius: 12,
+                          backgroundColor: theme.seedColor,
+                        ),
+                      );
+                    }).toList(),
                   ),
                 );
               },
